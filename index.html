@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <title>JM Exclusive Drive</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        /* --- JM EXCLUSIVE v25 (STICKY BUTTON) --- */
+        :root {
+            --gold: #D4AF37;
+            --black: #050505;
+            --white: #ffffff;
+            --green: #25D366;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; padding: 0; font-family: 'Outfit', sans-serif;
+            background-color: var(--black); color: var(--white);
+            height: 100vh; width: 100vw; overflow: hidden; user-select: none;
+        }
+
+        /* MAPA */
+        #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+
+        /* HEADER FLUTUANTE */
+        .top-bar { 
+            position: absolute; top: 50px; left: 24px; right: 24px; z-index: 10; 
+            display: flex; justify-content: space-between; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .float-btn {
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); 
+            border-radius: 50%; width: 44px; height: 44px;
+            display: flex; justify-content: center; align-items: center; 
+            border: 1px solid rgba(255,255,255,0.1); color: #fff; pointer-events: auto;
+        }
+
+        /* PAINEL PRINCIPAL */
+        .bottom-sheet {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, #000 90%, #0f0f0f);
+            z-index: 20; 
+            border-top-left-radius: 30px; border-top-right-radius: 30px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8); 
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            max-height: 90vh; 
+            border-top: 1px solid rgba(255,255,255,0.12);
+            display: flex; flex-direction: column;
+        }
+
+        /* Quando mostra o resultado, ele desce para 50% da tela */
+        .bottom-sheet.result-mode { max-height: 55vh; }
+
+        .drag-handle { width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 12px auto; flex-shrink: 0; }
+        
+        /* CONTEÚDO COM SCROLL */
+        .sheet-content { 
+            padding: 5px 24px; 
+            overflow-y: auto; 
+            flex-grow: 1; /* Ocupa o espaço que sobra */
+            padding-bottom: 80px; /* Espaço pro botão fixo não cobrir o conteúdo */
+        }
+
+        /* LOGO */
+        .brand-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; transition: 0.3s; }
+        .bottom-sheet.result-mode .brand-header { display: none; }
+
+        .logo-box {
+            width: 52px; height: 52px; background: linear-gradient(135deg, var(--gold), #997d25);
+            color: #000; font-weight: 900; font-size: 24px; letter-spacing: -1px;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 14px; margin-bottom: 10px;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+        }
+        .app-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 700; color: #fff; }
+        .app-subtitle { font-size: 0.65rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; font-weight: 600; opacity: 0.8; }
+
+        /* INPUTS */
+        .input-group { margin-bottom: 14px; position: relative; }
+        input {
+            width: 100%; background: #161616; border: 1px solid #2a2a2a;
+            padding: 18px 18px 18px 50px; border-radius: 16px;
+            color: #fff; font-size: 15px; font-family: 'Outfit', sans-serif;
+        }
+        input:focus { border-color: var(--gold); background: #1a1a1a; outline: none; }
+        .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #666; font-size: 20px; }
+        .mic-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #666; padding: 5px; cursor: pointer; }
+
+        .btn-gold {
+            width: 100%; background: linear-gradient(135deg, var(--gold) 0%, #907030 100%);
+            color: #000; padding: 20px; border: none; border-radius: 18px;
+            font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 1px;
+            margin-top: 20px; cursor: pointer; box-shadow: 0 8px 30px rgba(212, 175, 55, 0.15);
+        }
+
+        #result-panel { display: none; }
+
+        /* DESTAQUE KM E MIN */
+        .stats-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .stat-box { 
+            flex: 1; background: #141414; border: 1px solid #2a2a2a; border-radius: 12px;
+            padding: 10px; text-align: center;
+        }
+        .stat-val { font-size: 1.1rem; font-weight: 700; color: #fff; margin-top: 5px; }
+        .stat-label { font-size: 0.65rem; color: #777; text-transform: uppercase; margin-top: 2px; }
+
+        /* ANIMAÇÕES ÍCONES */
+        @keyframes drive { 0% { transform: translateX(-2px); } 50% { transform: translateX(2px); } 100% { transform: translateX(-2px); } }
+        @keyframes pulse-clock { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        .icon-anim-car { display: inline-block; font-size: 18px; animation: drive 1s infinite ease-in-out; }
+        .icon-anim-time { display: inline-block; font-size: 18px; animation: pulse-clock 2s infinite; }
+
+        /* CARD CARRO */
+        .car-card {
+            background: linear-gradient(145deg, #1a1a1a, #111);
+            border: 1px solid rgba(255,255,255,0.08); padding: 15px 20px; border-radius: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; border-left: 4px solid var(--gold);
+        }
+        .car-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; color: #fff; }
+        
+        @keyframes fan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .fan-icon { display: inline-block; animation: fan 2s linear infinite; color: #3498db; margin-right: 5px; font-size: 14px; vertical-align: middle; }
+        .car-desc { font-size: 0.85rem; color: #aaa; display: flex; align-items: center; }
+        .car-price { font-size: 1.6rem; font-weight: 800; color: var(--gold); }
+
+        /* LISTA RECIBO */
+        .receipt-list { margin-bottom: 10px; padding: 0 5px; }
+        .receipt-item { display: flex; justify-content: space-between; padding: 6px 0; color: #aaa; font-size: 0.85rem; }
+        .receipt-item.highlight { color: var(--gold); font-weight: 600; }
+        .receipt-item.total { 
+            color: #fff; font-size: 1rem; font-weight: 700; 
+            border-top: 1px solid #333; padding-top: 10px; margin-top: 5px; 
+        }
+
+        /* ÁREA DO BOTÃO FIXO (STICKY FOOTER) */
+        .sticky-footer {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 20px 24px;
+            background: linear-gradient(to top, #000 85%, rgba(0,0,0,0)); /* Degrade para o texto não cortar seco */
+            z-index: 50; display: none; /* Só aparece no resultado */
+        }
+
+        /* BOTÃO CONFIRMAR */
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+
+        .btn-confirm-reserva {
+            background: #25D366; color: #fff; 
+            padding: 18px; border-radius: 16px; width: 100%;
+            display: flex; justify-content: center; align-items: center; gap: 12px;
+            text-decoration: none; font-weight: 800; font-size: 1.1rem; 
+            text-transform: uppercase; letter-spacing: 0.5px;
+            animation: pulse-btn 2s infinite; text-align: center;
+        }
+
+        .gmnoprint { display:none; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="map"></div>
+
+    <div class="top-bar" id="top-bar">
+        <div class="float-btn"><span class="material-icons">menu</span></div>
+        <div class="float-btn"><span class="material-icons">person</span></div>
+    </div>
+
+    <div class="bottom-sheet" id="main-sheet">
+        <div class="drag-handle"></div>
+        
+        <div class="sheet-content">
+            
+            <div class="brand-header">
+                <div class="logo-box">JM</div>
+                <div class="app-title">JM EXCLUSIVE</div>
+                <div class="app-subtitle">DRIVE CAR</div>
+            </div>
+
+            <div id="form-panel">
+                <div class="input-group">
+                    <span class="material-icons input-icon">person</span>
+                    <input type="text" id="client-name" placeholder="Seu Nome">
+                </div>
+                <div class="input-group">
+                    <span class="material-icons input-icon">trip_origin</span>
+                    <input type="text" id="origin-input" placeholder="Onde vamos buscar?">
+                </div>
+                <div class="input-group">
+                    <span class="material-icons input-icon">location_on</span>
+                    <input type="text" id="destination-input" placeholder="Para onde vamos?">
+                </div>
+                <div class="input-group">
+                    <span class="material-icons input-icon">event</span>
+                    <input type="datetime-local" id="data-hora">
+                </div>
+                <button class="btn-gold" onclick="calculateRoute()">
+                    CALCULAR ROTA
+                </button>
+            </div>
+
+            <div id="result-panel">
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="icon-anim-car">🚗</div>
+                        <div class="stat-val" id="info-km">-- km</div>
+                        <div class="stat-label">Distância</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="icon-anim-time">⏱️</div>
+                        <div class="stat-val" id="info-min">-- min</div>
+                        <div class="stat-label">Tempo Est.</div>
+                    </div>
+                </div>
+
+                <div class="car-card">
+                    <div>
+                        <div class="car-title">JM Confort</div>
+                        <div class="car-desc">
+                            <span class="material-icons fan-icon">toys</span> 
+                            Climatizado
+                        </div>
+                    </div>
+                    <div>
+                        <div class="car-price" id="display-price">--</div>
+                    </div>
+                </div>
+
+                <div class="receipt-list">
+                    <div class="receipt-item"><span>Tarifa Base</span><span id="rec-base">R$ 0,00</span></div>
+                    <div class="receipt-item highlight" id="taxa-row" style="display:none;">
+                        <span id="label-taxa">Taxa Extra</span><span id="val-taxa">R$ 0,00</span>
+                    </div>
+                    <div class="receipt-item total"><span>Valor Final</span><span id="display-total">R$ 0,00</span></div>
+                </div>
+                
+                <p style="text-align:center; color:#555; font-size:0.8rem; cursor:pointer; margin-top:10px; margin-bottom:50px;" onclick="resetForm()">Nova cotação</p>
+            </div>
+        </div>
+
+        <div class="sticky-footer" id="sticky-btn-area">
+            <a id="btn-final-whatsapp" href="#" class="btn-confirm-reserva">
+                ✅ CONFIRMAR RESERVA
+            </a>
+        </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBgxFNZ0bmvUookFsuNxbXpT7IgTUS7Z5k&libraries=places&callback=initMap" async defer></script>
+
+    <script>
+        let map, directionsService, directionsRenderer;
+
+        window.onload = function() {
+            if(localStorage.getItem('jm_name')) document.getElementById('client-name').value = localStorage.getItem('jm_name');
+        }
+
+        function initMap() {
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ 
+                polylineOptions: { strokeColor: "#D4AF37", strokeWeight: 6 }, suppressMarkers: false 
+            });
+            
+            // MAPA PRETO E CINZA (SEM ESTRADAS AMARELAS)
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13, 
+                center: { lat: -19.9167, lng: -43.9345 }, 
+                disableDefaultUI: true,
+                styles: [
+                    { "elementType": "geometry", "stylers": [{ "color": "#212121" }] },
+                    { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+                    { "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
+                    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#212121" }] },
+                    { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "color": "#757575" }] },
+                    { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
+                    { "featureType": "road", "elementType": "geometry.fill", "stylers": [{ "color": "#2c2c2c" }] },
+                    { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#8a8a8a" }] },
+                    { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#373737" }] },
+                    { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#3c3c3c" }] }, /* RODOVIA CINZA */
+                    { "featureType": "road.highway.controlled_access", "elementType": "geometry", "stylers": [{ "color": "#4e4e4e" }] },
+                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#000000" }] }
+                ]
+            });
+            directionsRenderer.setMap(map);
+            
+            const options = { componentRestrictions: { country: "br" } };
+            new google.maps.places.Autocomplete(document.getElementById("origin-input"), options);
+            new google.maps.places.Autocomplete(document.getElementById("destination-input"), options);
+        }
+
+        function calculateRoute() {
+            const name = document.getElementById("client-name").value;
+            const origin = document.getElementById("origin-input").value;
+            const dest = document.getElementById("destination-input").value;
+            const date = document.getElementById("data-hora").value;
+
+            if(!name || !origin || !dest || !date) { alert("Preencha todos os campos."); return; }
+            localStorage.setItem('jm_name', name);
+
+            const request = { origin: origin, destination: dest, travelMode: 'DRIVING' };
+            directionsService.route(request, function(result, status) {
+                if (status == 'OK') {
+                    directionsRenderer.setDirections(result);
+                    
+                    document.getElementById("main-sheet").classList.add("result-mode");
+                    document.getElementById("top-bar").style.opacity = "0"; 
+
+                    // MOSTRA O BOTÃO FIXO
+                    document.getElementById("sticky-btn-area").style.display = "block";
+
+                    const leg = result.routes[0].legs[0];
+                    const km = leg.distance.value / 1000;
+                    const min = leg.duration.value / 60;
+                    
+                    // Mapa Fit Bounds
+                    const bounds = new google.maps.LatLngBounds();
+                    result.routes[0].legs[0].steps.forEach(step => {
+                        bounds.extend(step.start_location);
+                        bounds.extend(step.end_location);
+                    });
+                    map.fitBounds(bounds);
+                    map.panBy(0, -80); 
+
+                    // PRECIFICAÇÃO (AJUSTADA)
+                    const BANDEIRADA = 5.00; 
+                    const PRECO_KM = 2.00; 
+                    const PRECO_MIN = 0.20;
+                    
+                    let base = BANDEIRADA + (km * PRECO_KM) + (min * PRECO_MIN);
+                    if(base < 15) base = 15;
+
+                    let taxaVal = 0, taxaNome = "";
+                    const hour = new Date(date).getHours();
+                    
+                    if (km > 30) { taxaVal += base * 0.20; taxaNome = "Taxa de Retorno"; }
+                    if (hour >= 0 && hour < 6) { 
+                        taxaVal += base * 0.20; 
+                        taxaNome = taxaVal > (base*0.25) ? "Retorno + Noturno" : "Adicional Noturno"; 
+                    }
+
+                    const total = base + taxaVal;
+                    const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    const resID = "#RES-" + Math.floor(Math.random() * 90000 + 10000);
+
+                    document.getElementById("display-price").innerText = fmt(total);
+                    document.getElementById("info-km").innerText = km.toFixed(1) + " km";
+                    document.getElementById("info-min").innerText = Math.round(min) + " min";
+                    
+                    document.getElementById("rec-base").innerText = fmt(base);
+                    document.getElementById("display-total").innerText = fmt(total);
+
+                    if(taxaVal > 0) {
+                        document.getElementById("taxa-row").style.display = "flex";
+                        document.getElementById("label-taxa").innerText = taxaNome;
+                        document.getElementById("val-taxa").innerText = fmt(taxaVal);
+                    } else {
+                        document.getElementById("taxa-row").style.display = "none";
+                    }
+
+                    const dateObj = new Date(date);
+                    const dataFmt = dateObj.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+                    const horaFmt = dateObj.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+
+                    const textZap = `Olá, fiz uma cotação no App e gostaria de confirmar:\n\n` +
+                                    `🆔 *Reserva:* ${resID}\n` +
+                                    `👤 *Cliente:* ${name.toUpperCase()}\n` +
+                                    `📍 *Trajeto:* ${origin} ➝ ${dest}\n` +
+                                    `📏 *Distância:* ${km.toFixed(1)} km\n` +
+                                    `📅 *Data:* ${dataFmt} às ${horaFmt}\n` +
+                                    `💎 *Valor:* ${fmt(total)}\n\n` +
+                                    `Aguardo confirmação!`;
+
+                    document.getElementById("btn-final-whatsapp").href = `https://wa.me/5531992244800?text=${encodeURIComponent(textZap)}`;
+
+                    document.getElementById("form-panel").style.display = "none";
+                    document.getElementById("result-panel").style.display = "block";
+
+                } else {
+                    alert("Rota não encontrada.");
+                }
+            });
+        }
+
+        function resetForm() {
+            document.getElementById("main-sheet").classList.remove("result-mode");
+            document.getElementById("top-bar").style.opacity = "1";
+            document.getElementById("result-panel").style.display = "none";
+            document.getElementById("sticky-btn-area").style.display = "none"; // Esconde botão fixo
+            document.getElementById("form-panel").style.display = "block";
+            
+            document.getElementById("origin-input").value = "";
+            document.getElementById("destination-input").value = "";
+            document.getElementById("data-hora").value = "";
+            
+            map.setZoom(13);
+            map.setCenter({ lat: -19.9167, lng: -43.9345 });
+            directionsRenderer.setDirections({routes: []});
+        }
+    </script>
+</body>
+</html>
