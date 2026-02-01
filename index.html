@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <style>
-        /* --- JM EXCLUSIVE v26 (FINAL SIGNED) --- */
+        /* --- JM EXCLUSIVE v27 (PROFIT FIX) --- */
         :root {
             --gold: #D4AF37;
             --black: #050505;
@@ -35,7 +35,7 @@
         /* MAPA */
         #map { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
 
-        /* HEADER FLUTUANTE */
+        /* HEADER */
         .top-bar { 
             position: absolute; top: 50px; left: 24px; right: 24px; z-index: 10; 
             display: flex; justify-content: space-between; pointer-events: none;
@@ -48,7 +48,7 @@
             border: 1px solid rgba(255,255,255,0.1); color: #fff; pointer-events: auto;
         }
 
-        /* PAINEL PRINCIPAL */
+        /* PAINEL */
         .bottom-sheet {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: linear-gradient(to top, #000 90%, #0f0f0f);
@@ -61,17 +61,10 @@
             display: flex; flex-direction: column;
         }
 
-        /* MODO RESULTADO */
         .bottom-sheet.result-mode { max-height: 55vh; }
 
         .drag-handle { width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 12px auto; flex-shrink: 0; }
-        
-        .sheet-content { 
-            padding: 5px 24px; 
-            overflow-y: auto; 
-            flex-grow: 1; 
-            padding-bottom: 100px; /* Espaço extra pro footer */
-        }
+        .sheet-content { padding: 5px 24px; overflow-y: auto; flex-grow: 1; padding-bottom: 100px; }
 
         /* LOGO */
         .brand-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; transition: 0.3s; }
@@ -107,7 +100,7 @@
 
         #result-panel { display: none; }
 
-        /* DESTAQUE KM E MIN */
+        /* STATS */
         .stats-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .stat-box { 
             flex: 1; background: #141414; border: 1px solid #2a2a2a; border-radius: 12px;
@@ -130,7 +123,6 @@
             margin-bottom: 15px; border-left: 4px solid var(--gold);
         }
         .car-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; color: #fff; }
-        
         @keyframes fan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .fan-icon { display: inline-block; animation: fan 2s linear infinite; color: #3498db; margin-right: 5px; font-size: 14px; vertical-align: middle; }
         .car-desc { font-size: 0.85rem; color: #aaa; display: flex; align-items: center; }
@@ -145,7 +137,7 @@
             border-top: 1px solid #333; padding-top: 10px; margin-top: 5px; 
         }
 
-        /* ÁREA FIXA DO BOTÃO */
+        /* STICKY FOOTER */
         .sticky-footer {
             position: absolute; bottom: 0; left: 0; width: 100%;
             padding: 20px 24px;
@@ -153,7 +145,7 @@
             z-index: 50; display: none;
         }
 
-        /* BOTÃO CONFIRMAR */
+        /* BOTÃO */
         @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
 
         .btn-confirm-reserva {
@@ -165,7 +157,7 @@
             animation: pulse-btn 2s infinite; text-align: center;
         }
 
-        /* ASSINATURA / COPYRIGHT */
+        /* COPYRIGHT */
         .copyright {
             text-align: center; margin-top: 30px; font-size: 0.65rem; 
             color: #333; text-transform: uppercase; letter-spacing: 1px; line-height: 1.6;
@@ -339,9 +331,10 @@
                     map.fitBounds(bounds);
                     map.panBy(0, -80); 
 
+                    // --- PREÇO ATUALIZADO (LUCRO) ---
                     const BANDEIRADA = 5.00; 
-                    const PRECO_KM = 2.00; 
-                    const PRECO_MIN = 0.20;
+                    const PRECO_KM = 2.60;  // <-- AUMENTADO
+                    const PRECO_MIN = 0.25; // <-- AUMENTADO
                     
                     let base = BANDEIRADA + (km * PRECO_KM) + (min * PRECO_MIN);
                     if(base < 15) base = 15;
