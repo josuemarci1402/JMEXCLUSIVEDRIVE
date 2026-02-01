@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
+    
+    <meta name="author" content="Josué Marciano">
+    <meta name="copyright" content="© 2026 JM Exclusive">
+    
     <title>JM Exclusive Drive</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +16,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <style>
-        /* --- JM EXCLUSIVE v25 (STICKY BUTTON) --- */
+        /* --- JM EXCLUSIVE v26 (FINAL SIGNED) --- */
         :root {
             --gold: #D4AF37;
             --black: #050505;
@@ -57,17 +61,16 @@
             display: flex; flex-direction: column;
         }
 
-        /* Quando mostra o resultado, ele desce para 50% da tela */
+        /* MODO RESULTADO */
         .bottom-sheet.result-mode { max-height: 55vh; }
 
         .drag-handle { width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 12px auto; flex-shrink: 0; }
         
-        /* CONTEÚDO COM SCROLL */
         .sheet-content { 
             padding: 5px 24px; 
             overflow-y: auto; 
-            flex-grow: 1; /* Ocupa o espaço que sobra */
-            padding-bottom: 80px; /* Espaço pro botão fixo não cobrir o conteúdo */
+            flex-grow: 1; 
+            padding-bottom: 100px; /* Espaço extra pro footer */
         }
 
         /* LOGO */
@@ -113,7 +116,7 @@
         .stat-val { font-size: 1.1rem; font-weight: 700; color: #fff; margin-top: 5px; }
         .stat-label { font-size: 0.65rem; color: #777; text-transform: uppercase; margin-top: 2px; }
 
-        /* ANIMAÇÕES ÍCONES */
+        /* ANIMAÇÕES */
         @keyframes drive { 0% { transform: translateX(-2px); } 50% { transform: translateX(2px); } 100% { transform: translateX(-2px); } }
         @keyframes pulse-clock { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
         .icon-anim-car { display: inline-block; font-size: 18px; animation: drive 1s infinite ease-in-out; }
@@ -133,7 +136,7 @@
         .car-desc { font-size: 0.85rem; color: #aaa; display: flex; align-items: center; }
         .car-price { font-size: 1.6rem; font-weight: 800; color: var(--gold); }
 
-        /* LISTA RECIBO */
+        /* RECIBO */
         .receipt-list { margin-bottom: 10px; padding: 0 5px; }
         .receipt-item { display: flex; justify-content: space-between; padding: 6px 0; color: #aaa; font-size: 0.85rem; }
         .receipt-item.highlight { color: var(--gold); font-weight: 600; }
@@ -142,12 +145,12 @@
             border-top: 1px solid #333; padding-top: 10px; margin-top: 5px; 
         }
 
-        /* ÁREA DO BOTÃO FIXO (STICKY FOOTER) */
+        /* ÁREA FIXA DO BOTÃO */
         .sticky-footer {
             position: absolute; bottom: 0; left: 0; width: 100%;
             padding: 20px 24px;
-            background: linear-gradient(to top, #000 85%, rgba(0,0,0,0)); /* Degrade para o texto não cortar seco */
-            z-index: 50; display: none; /* Só aparece no resultado */
+            background: linear-gradient(to top, #000 85%, rgba(0,0,0,0));
+            z-index: 50; display: none;
         }
 
         /* BOTÃO CONFIRMAR */
@@ -161,6 +164,13 @@
             text-transform: uppercase; letter-spacing: 0.5px;
             animation: pulse-btn 2s infinite; text-align: center;
         }
+
+        /* ASSINATURA / COPYRIGHT */
+        .copyright {
+            text-align: center; margin-top: 30px; font-size: 0.65rem; 
+            color: #333; text-transform: uppercase; letter-spacing: 1px; line-height: 1.6;
+        }
+        .copyright span { color: var(--gold); font-weight: 700; }
 
         .gmnoprint { display:none; }
     </style>
@@ -205,6 +215,11 @@
                 <button class="btn-gold" onclick="calculateRoute()">
                     CALCULAR ROTA
                 </button>
+                
+                <div class="copyright">
+                    © 2026 JM Exclusive<br>
+                    Desenvolvido por <span>Josué Marciano</span>
+                </div>
             </div>
 
             <div id="result-panel">
@@ -242,7 +257,11 @@
                     <div class="receipt-item total"><span>Valor Final</span><span id="display-total">R$ 0,00</span></div>
                 </div>
                 
-                <p style="text-align:center; color:#555; font-size:0.8rem; cursor:pointer; margin-top:10px; margin-bottom:50px;" onclick="resetForm()">Nova cotação</p>
+                <p style="text-align:center; color:#555; font-size:0.8rem; cursor:pointer; margin-top:10px; margin-bottom:10px;" onclick="resetForm()">Nova cotação</p>
+                
+                <div class="copyright">
+                    Tecnologia <span>Josué Marciano</span>
+                </div>
             </div>
         </div>
 
@@ -265,10 +284,10 @@
         function initMap() {
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({ 
-                polylineOptions: { strokeColor: "#D4AF37", strokeWeight: 6 }, suppressMarkers: false 
+                polylineOptions: { strokeColor: "#D4AF37", strokeWeight: 6 }, 
+                suppressMarkers: false 
             });
             
-            // MAPA PRETO E CINZA (SEM ESTRADAS AMARELAS)
             map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 13, 
                 center: { lat: -19.9167, lng: -43.9345 }, 
@@ -278,13 +297,8 @@
                     { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
                     { "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
                     { "elementType": "labels.text.stroke", "stylers": [{ "color": "#212121" }] },
-                    { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "color": "#757575" }] },
-                    { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
                     { "featureType": "road", "elementType": "geometry.fill", "stylers": [{ "color": "#2c2c2c" }] },
-                    { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#8a8a8a" }] },
-                    { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#373737" }] },
-                    { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#3c3c3c" }] }, /* RODOVIA CINZA */
-                    { "featureType": "road.highway.controlled_access", "elementType": "geometry", "stylers": [{ "color": "#4e4e4e" }] },
+                    { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#3c3c3c" }] },
                     { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#000000" }] }
                 ]
             });
@@ -311,15 +325,12 @@
                     
                     document.getElementById("main-sheet").classList.add("result-mode");
                     document.getElementById("top-bar").style.opacity = "0"; 
-
-                    // MOSTRA O BOTÃO FIXO
                     document.getElementById("sticky-btn-area").style.display = "block";
 
                     const leg = result.routes[0].legs[0];
                     const km = leg.distance.value / 1000;
                     const min = leg.duration.value / 60;
                     
-                    // Mapa Fit Bounds
                     const bounds = new google.maps.LatLngBounds();
                     result.routes[0].legs[0].steps.forEach(step => {
                         bounds.extend(step.start_location);
@@ -328,7 +339,6 @@
                     map.fitBounds(bounds);
                     map.panBy(0, -80); 
 
-                    // PRECIFICAÇÃO (AJUSTADA)
                     const BANDEIRADA = 5.00; 
                     const PRECO_KM = 2.00; 
                     const PRECO_MIN = 0.20;
@@ -392,7 +402,7 @@
             document.getElementById("main-sheet").classList.remove("result-mode");
             document.getElementById("top-bar").style.opacity = "1";
             document.getElementById("result-panel").style.display = "none";
-            document.getElementById("sticky-btn-area").style.display = "none"; // Esconde botão fixo
+            document.getElementById("sticky-btn-area").style.display = "none";
             document.getElementById("form-panel").style.display = "block";
             
             document.getElementById("origin-input").value = "";
