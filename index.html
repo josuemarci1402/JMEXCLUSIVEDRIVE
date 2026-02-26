@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <style>
-        /* --- JM EXCLUSIVE v31 (FINAL SYSTEM) --- */
+        /* --- JM EXCLUSIVE v32 (ROUND TRIP EDITION) --- */
         :root {
             --gold: #D4AF37;
             --black: #050505;
@@ -59,9 +59,7 @@
             text-transform: uppercase; letter-spacing: 1px;
         }
 
-        .modal-text { 
-            font-size: 0.95rem; color: #ccc; line-height: 1.5; margin-bottom: 20px; 
-        }
+        .modal-text { font-size: 0.95rem; color: #ccc; line-height: 1.5; margin-bottom: 20px; }
 
         .feature-list { text-align: left; margin-bottom: 25px; background: #1a1a1a; padding: 15px; border-radius: 12px; }
         .feature-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: start; }
@@ -108,7 +106,7 @@
         .bottom-sheet.result-mode { max-height: 55vh; }
 
         .drag-handle { width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 12px auto; flex-shrink: 0; }
-        .sheet-content { padding: 5px 24px; overflow-y: auto; flex-grow: 1; padding-bottom: 120px; } /* Aumentei padding pra caber footer */
+        .sheet-content { padding: 5px 24px; overflow-y: auto; flex-grow: 1; padding-bottom: 120px; }
 
         /* LOGO */
         .brand-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; transition: 0.3s; }
@@ -127,28 +125,32 @@
         /* INPUTS */
         .input-group { margin-bottom: 14px; position: relative; }
         
-        input {
+        input, select {
             width: 100%; background: #161616; border: 1px solid #2a2a2a;
             padding: 18px 18px 18px 50px; border-radius: 16px;
             color: #fff; font-size: 15px; font-family: 'Outfit', sans-serif;
-            -webkit-appearance: none; /* CORREÇÃO IPHONE */
-            appearance: none;
+            -webkit-appearance: none; appearance: none;
         }
         
-        /* CORREÇÃO ESPECÍFICA PARA DATA NO MOBILE */
-        input[type="datetime-local"] {
-            min-height: 55px; /* Altura fixa para alinhar */
-            color: #fff;
-        }
-        /* Ícone de Calendário Branco */
-        ::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            opacity: 0.6;
-        }
+        input[type="datetime-local"] { min-height: 55px; color: #fff; }
+        ::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; }
 
-        input:focus { border-color: var(--gold); background: #1a1a1a; outline: none; }
+        input:focus, select:focus { border-color: var(--gold); background: #1a1a1a; outline: none; }
         .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #666; font-size: 20px; }
-        .mic-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #666; padding: 5px; cursor: pointer; }
+        
+        /* SWITCH DE IDA E VOLTA */
+        .toggle-box {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #161616; padding: 16px 20px; border-radius: 16px;
+            margin-bottom: 14px; border: 1px solid #2a2a2a;
+        }
+        .toggle-label { display: flex; align-items: center; gap: 10px; color: #fff; font-size: 15px; font-weight: 500;}
+        .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--gold); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         .btn-gold {
             width: 100%; background: linear-gradient(135deg, var(--gold) 0%, #907030 100%);
@@ -224,7 +226,6 @@
         }
         .copyright span { color: var(--gold); font-weight: 700; }
         
-        /* LINK INSTAGRAM */
         .insta-link {
             display: block; text-align: center; margin-top: 8px;
             color: #666; font-size: 0.7rem; text-decoration: none;
@@ -301,6 +302,31 @@
                     <span class="material-icons input-icon">event</span>
                     <input type="datetime-local" id="data-hora">
                 </div>
+
+                <div class="toggle-box">
+                    <div class="toggle-label">
+                        <span class="material-icons" style="color:var(--gold);">sync_alt</span>
+                        Viagem de Ida e Volta?
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="round-trip-toggle" onchange="toggleWaitTime()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="input-group" id="wait-time-group" style="display: none;">
+                    <span class="material-icons input-icon">hourglass_empty</span>
+                    <select id="wait-time-select">
+                        <option value="0">Sem espera (Bate e volta imediato)</option>
+                        <option value="1">Aguardar 1 hora no destino</option>
+                        <option value="2">Aguardar 2 horas no destino</option>
+                        <option value="3">Aguardar 3 horas no destino</option>
+                        <option value="4">Aguardar 4 horas no destino</option>
+                        <option value="5">Aguardar 5 horas no destino</option>
+                    </select>
+                    <span class="material-icons" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #666; pointer-events: none;">expand_more</span>
+                </div>
+
                 <button class="btn-gold" onclick="calculateRoute()">
                     CALCULAR ROTA
                 </button>
@@ -343,6 +369,11 @@
 
                 <div class="receipt-list">
                     <div class="receipt-item"><span>Tarifa Base</span><span id="rec-base">R$ 0,00</span></div>
+                    
+                    <div class="receipt-item highlight" id="espera-row" style="display:none; color:#3498db;">
+                        <span>Tempo de Espera</span><span id="val-espera">R$ 0,00</span>
+                    </div>
+
                     <div class="receipt-item highlight" id="taxa-row" style="display:none;">
                         <span id="label-taxa">Taxa Extra</span><span id="val-taxa">R$ 0,00</span>
                     </div>
@@ -381,22 +412,29 @@
         }
 
         function vibratePhone() {
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
+            if (navigator.vibrate) { navigator.vibrate(50); }
+        }
+
+        // MOSTRA/ESCONDE CAMPO DE ESPERA
+        function toggleWaitTime() {
+            const isRoundTrip = document.getElementById("round-trip-toggle").checked;
+            const waitGroup = document.getElementById("wait-time-group");
+            if(isRoundTrip) {
+                waitGroup.style.display = "block";
+            } else {
+                waitGroup.style.display = "none";
+                document.getElementById("wait-time-select").value = "0"; // reseta
             }
         }
 
         function initMap() {
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({ 
-                polylineOptions: { strokeColor: "#D4AF37", strokeWeight: 6 }, 
-                suppressMarkers: false 
+                polylineOptions: { strokeColor: "#D4AF37", strokeWeight: 6 }, suppressMarkers: false 
             });
             
             map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 13, 
-                center: { lat: -19.9167, lng: -43.9345 }, 
-                disableDefaultUI: true,
+                zoom: 13, center: { lat: -19.9167, lng: -43.9345 }, disableDefaultUI: true,
                 styles: [
                     { "elementType": "geometry", "stylers": [{ "color": "#212121" }] },
                     { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
@@ -421,6 +459,8 @@
             const origin = document.getElementById("origin-input").value;
             const dest = document.getElementById("destination-input").value;
             const date = document.getElementById("data-hora").value;
+            const isRoundTrip = document.getElementById("round-trip-toggle").checked;
+            const waitHours = parseInt(document.getElementById("wait-time-select").value);
 
             if(!name || !origin || !dest || !date) { alert("Preencha todos os campos."); return; }
             localStorage.setItem('jm_name', name);
@@ -434,10 +474,16 @@
                     document.getElementById("top-bar").style.opacity = "0"; 
                     document.getElementById("sticky-btn-area").style.display = "block";
 
-                    const leg = result.routes[0].legs[0];
-                    const km = leg.distance.value / 1000;
-                    const min = leg.duration.value / 60;
+                    let leg = result.routes[0].legs[0];
+                    let km = leg.distance.value / 1000;
+                    let min = leg.duration.value / 60;
                     
+                    // SE FOR IDA E VOLTA, DOBRA O KM E TEMPO
+                    if (isRoundTrip) {
+                        km = km * 2;
+                        min = min * 2;
+                    }
+
                     const bounds = new google.maps.LatLngBounds();
                     result.routes[0].legs[0].steps.forEach(step => {
                         bounds.extend(step.start_location);
@@ -446,24 +492,30 @@
                     map.fitBounds(bounds);
                     map.panBy(0, -80); 
 
-                    // --- PREÇO ---
+                    // --- PRECIFICAÇÃO ---
                     const BANDEIRADA = 5.00; 
                     const PRECO_KM = 2.60;
                     const PRECO_MIN = 0.25;
+                    const VALOR_HORA_ESPERA = 50.00; // <--- ALTERE AQUI O VALOR DA SUA HORA DE ESPERA
                     
                     let base = BANDEIRADA + (km * PRECO_KM) + (min * PRECO_MIN);
+                    
+                    // Adiciona valor da espera
+                    let custoEspera = isRoundTrip ? (waitHours * VALOR_HORA_ESPERA) : 0;
+
                     if(base < 15) base = 15;
 
                     let taxaVal = 0, taxaNome = "";
                     const hour = new Date(date).getHours();
                     
-                    if (km > 30) { taxaVal += base * 0.20; taxaNome = "Taxa de Retorno"; }
+                    // Se for ida e volta, o motorista não cobra taxa de retorno vazio.
+                    if (km > 30 && !isRoundTrip) { taxaVal += base * 0.20; taxaNome = "Taxa de Retorno"; }
                     if (hour >= 0 && hour < 6) { 
                         taxaVal += base * 0.20; 
-                        taxaNome = taxaVal > (base*0.25) ? "Retorno + Noturno" : "Adicional Noturno"; 
+                        taxaNome = taxaVal > (base*0.25) && !isRoundTrip ? "Retorno + Noturno" : "Adicional Noturno"; 
                     }
 
-                    const total = base + taxaVal;
+                    const total = base + custoEspera + taxaVal;
                     const fmt = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                     const resID = "#RES-" + Math.floor(Math.random() * 90000 + 10000);
 
@@ -473,6 +525,14 @@
                     
                     document.getElementById("rec-base").innerText = fmt(base);
                     document.getElementById("display-total").innerText = fmt(total);
+
+                    // Mostra linha de espera no recibo se existir
+                    if(custoEspera > 0) {
+                        document.getElementById("espera-row").style.display = "flex";
+                        document.getElementById("val-espera").innerText = fmt(custoEspera);
+                    } else {
+                        document.getElementById("espera-row").style.display = "none";
+                    }
 
                     if(taxaVal > 0) {
                         document.getElementById("taxa-row").style.display = "flex";
@@ -486,13 +546,15 @@
                     const dataFmt = dateObj.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
                     const horaFmt = dateObj.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
 
-                    // --- MENSAGEM LIMPA ---
                     const cleanOrigin = origin.replace(', Brasil', '');
                     const cleanDest = dest.replace(', Brasil', '');
+                    
+                    const tipoViagem = isRoundTrip ? `Ida e Volta (Espera: ${waitHours}h)` : `Somente Ida`;
 
                     const textZap = `🔔 *NOVA SOLICITAÇÃO*%0A%0A` +
                                     `👤 *Cliente:* ${name.toUpperCase()}%0A` +
-                                    `🆔 *Reserva:* ${resID}%0A%0A` +
+                                    `🆔 *Reserva:* ${resID}%0A` +
+                                    `🔄 *Tipo:* ${tipoViagem}%0A%0A` +
                                     `📍 *Origem:*%0A${cleanOrigin}%0A%0A` +
                                     `🏁 *Destino:*%0A${cleanDest}%0A%0A` +
                                     `📅 *Data:* ${dataFmt} às ${horaFmt}%0A` +
@@ -519,9 +581,12 @@
             document.getElementById("sticky-btn-area").style.display = "none";
             document.getElementById("form-panel").style.display = "block";
             
+            // Reseta campos
             document.getElementById("origin-input").value = "";
             document.getElementById("destination-input").value = "";
             document.getElementById("data-hora").value = "";
+            document.getElementById("round-trip-toggle").checked = false;
+            toggleWaitTime();
             
             map.setZoom(13);
             map.setCenter({ lat: -19.9167, lng: -43.9345 });
